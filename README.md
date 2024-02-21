@@ -6,6 +6,8 @@
     * Change the default editor to one you prefer (or Nano).
     * Select "override branch name for new repositories" (leave it as "main").
 * Install [Python](https://www.python.org/downloads/)
+  * Make sure to select "Add Python 3.X to PATH" in the installer, otherwise `python` and `pip` will not be recognized in a terminal.
+    * If you forgot, run the installer again, select "Modify", click "Next", then select "Add Python to environment variables".
 * Install `pygame` once Python is installed:
   * Open a terminal (such as Command Prompt) and type `pip install pygame`
 
