@@ -1,6 +1,9 @@
 ## Development Environment Setup
 * Install [Visual Studio Code](https://code.visualstudio.com/Download)
   * Install [Microsoft's Python Extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+  * Click the settings button in the bottom left corner, then press "Settings":
+    * Change "Auto Save" to `afterDelay`
+    * Change "Autofetch" to `true` (notifies you of changes to the GitHub repository)
 * Install [Git](https://git-scm.com/downloads)
   * In the installer, you may prefer to change a few options:
     * Change the default editor to one you prefer (or Nano).
