@@ -1,37 +1,39 @@
+import pygame
+from pygame.locals import *
+import math
 
 class Tile:
-  def __init__(self, x, y, size):
-      self.x = x
-      self.y = y
-      self.size = size
-      self.color = color(0, 0, 255)
+    def __init__(self, x, y, size):
+        self.x = x
+        self.y = y
+        self.size = size
+        self.color = (0, 0, 255)
 
-  def display(self):
-      fill(self.color)
-      rect(self.x, self.y, self.size, self.size)
+    def display(self, screen):
+        pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
 
 class Grid:
-  def __init__(self, x, y, rows, columns, tile_size):
-      self.x = x  # x position of the grid
-      self.y = y  # y position of the grid
-      self.rows = rows
-      self.columns = columns
-      self.tile_size = tile_size
-      self.tiles = []
+    def __init__(self, x, y, rows, columns, tile_size):
+        self.x = x 
+        self.y = y
+        self.rows = rows
+        self.columns = columns
+        self.tile_size = tile_size
+        self.tiles = []
 
-      for i in range(self.rows):
-          row = []
-          for j in range(self.columns):
-              tile_x = self.x + j * self.tile_size
-              tile_y = self.y + i * self.tile_size
-              tile = Tile(tile_x, tile_y, self.tile_size)
-              row.append(tile)
-          self.tiles.append(row)
+        for i in range(self.rows):
+            row = []
+            for j in range(self.columns):
+                tile_x = self.x + j * self.tile_size
+                tile_y = self.y + i * self.tile_size
+                tile = Tile(tile_x, tile_y, self.tile_size)
+                row.append(tile)
+            self.tiles.append(row)
 
-  def display(self):
-      for row in self.tiles:
-          for tile in row:
-              tile.display()
+    def display(self, screen):
+        for row in self.tiles:
+            for tile in row:
+                tile.display(screen)
 
 class MovingEntity:
   def __init__(self, grid, start_x, start_y, step_size, move_interval):
@@ -70,13 +72,12 @@ class MovingEntity:
           dx = self.target_x - self.x
 
           # calculate the magnitude of the distance vector
-          distance = sqrt(dx * dx + dy * dy)
+          distance = pow(dx * dx + dy * dy, 1/2)
 
           # normalize the distance vector
           if distance > 0:
               dx /= distance
               dy /= distance
-
           # move the entity by step size towards the target position
           self.x += dx * self.step_size
           self.y += dy * self.step_size
@@ -90,31 +91,54 @@ class MovingEntity:
               self.is_moving = False
 
   def display(self):
-      fill(255, 255, 0)  
-      rect(self.grid.x + self.y * self.grid.tile_size, self.grid.y + self.x * self.grid.tile_size, self.grid.tile_size, self.grid.tile_size)
+    pygame.draw.rect(screen, (0, 255, 0),  (self.grid.x + self.y * self.grid.tile_size, self.grid.y + self.x * self.grid.tile_size, self.grid.tile_size, self.grid.tile_size))
 
-def setup():
-  global grid, entity
-  size(1000, 1000)
-  rows = 36
-  columns = 28
-  tile_size = 20
-  grid = Grid(0, 0, rows, columns, tile_size)
-  entity = MovingEntity(grid, 0, 0, 0.1, 10)
 
-def draw():
-  background(0)
-  grid.display()
-  entity.update_movement()
-  entity.display()
+# game setup
+pygame.init()
+screen = pygame.display.set_mode((1280, 720))
+clock = pygame.time.Clock()
+running = True
+dt = 0
 
-def keyPressed():
-  if keyCode == UP:
-      entity.set_direction('up')
-  elif keyCode == DOWN:
-      entity.set_direction('down')
-  elif keyCode == LEFT:
-      entity.set_direction('left')
-  elif keyCode == RIGHT:
-      entity.set_direction('right')
-    
+
+rows = 36
+columns = 28
+tile_size = 20
+grid = Grid(0, 0, rows, columns, tile_size)
+entity = MovingEntity(grid, 0, 0, 0.1, 10)
+
+# main game loop
+while running:
+    # poll for events
+    # pygame.QUIT event means the user clicked X to close your window
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                entity.set_direction('up')
+            if event.key == pygame.K_DOWN:
+                entity.set_direction('down')
+            if event.key == pygame.K_LEFT:
+                entity.set_direction('left')
+            if event.key == pygame.K_RIGHT:
+                entity.set_direction('right')
+
+
+    # fill the screen with a color to wipe away anything from last frame
+    screen.fill((0, 0, 0))
+    grid.display(screen)
+    entity.update_movement()
+    entity.display()
+
+
+    pygame.display.flip()
+
+    # limits FPS to 60
+    # dt is delta time in seconds since last frame, used for framerate-
+    # independent physics.
+    dt = clock.tick(60) / 1000
+
+pygame.quit()
