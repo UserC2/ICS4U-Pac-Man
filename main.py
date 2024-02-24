@@ -41,23 +41,29 @@ class MovingEntity:
         self.x = x
         self.y = y
         self.speed = speed
-        self.direction_x = -1
-        self.direction_y = 0
-        self.input_direction_x = -1
-        self.input_direction_y = 0
-     
+        self.x_direction = -1
+        self.y_direction = 0
+        self.input_x_direction = -1
+        self.input_y_direction = 0
+        self.center_of_tile_detector_length = 1
+        
     def update(self):
-        # checks if the input direction is not equal to the current direction or opposite of current direction
-        if (self.input_direction_x, self.input_direction_y) != (self.direction_x, self.direction_y) and (self.input_direction_x, self.input_direction_y) != (-self.direction_x, -self.direction_y):
+        # Checks if input is in a perpendicular direction, and if entity is in the center of grid detector
+        center_of_tile_x = (self.x // self.grid.tile_size) * self.grid.tile_size + self.grid.tile_size // 2
+        center_of_tile_y = (self.y // self.grid.tile_size) * self.grid.tile_size + self.grid.tile_size // 2
+        if (self.input_x_direction, self.input_y_direction) != (self.x_direction, self.y_direction) and (self.input_x_direction, self.input_y_direction) != (-self.x_direction, -self.y_direction) and (center_of_tile_x + self.center_of_tile_detector_length) > self.x and (center_of_tile_x - self.center_of_tile_detector_length) < self.x and (center_of_tile_y + self.center_of_tile_detector_length) > self.y and (center_of_tile_y - self.center_of_tile_detector_length) < self.y:
             # teleport to the center of the current tile
-            self.x = (self.x // self.grid.tile_size) * self.grid.tile_size + self.grid.tile_size // 2
-            self.y = (self.y // self.grid.tile_size) * self.grid.tile_size + self.grid.tile_size // 2
-        self.direction_x, self.direction_y = self.input_direction_x, self.input_direction_y
-        self.x += self.direction_x * self.speed
-        self.y += self.direction_y * self.speed
+            self.x = center_of_tile_x
+            self.y = center_of_tile_y
+            self.x_direction, self.y_direction = self.input_x_direction, self.input_y_direction
+        elif (self.input_x_direction, self.input_y_direction) == (-self.x_direction, -self.y_direction):
+            self.x_direction, self.y_direction = self.input_x_direction, self.input_y_direction
+
+        self.x += self.x_direction * self.speed
+        self.y += self.y_direction * self.speed
 
     def display(self, screen):
-        pygame.draw.rect(screen, ("yellow"),  (self.x, self.y, self.grid.tile_size, self.grid.tile_size))
+        pygame.draw.rect(screen, ("yellow"),  (self.x + (self.grid.tile_size // 2), self.y + (self.grid.tile_size // 2), self.grid.tile_size, self.grid.tile_size))
 
 # game setup
 pygame.init()
@@ -83,17 +89,17 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                entity.input_direction_x = 0
-                entity.input_direction_y = -1
+                entity.input_x_direction = 0
+                entity.input_y_direction = -1
             if event.key == pygame.K_DOWN:
-                entity.input_direction_x = 0
-                entity.input_direction_y = 1
+                entity.input_x_direction = 0
+                entity.input_y_direction = 1
             if event.key == pygame.K_LEFT:
-                entity.input_direction_x = -1
-                entity.input_direction_y = 0
+                entity.input_x_direction = -1
+                entity.input_y_direction = 0
             if event.key == pygame.K_RIGHT:
-                entity.input_direction_x = 1
-                entity.input_direction_y = 0
+                entity.input_x_direction = 1
+                entity.input_y_direction = 0
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill((0, 0, 0))
@@ -101,7 +107,6 @@ while running:
     entity.update()
     entity.display(screen)
     
-    print(entity.y)
     pygame.display.flip()
 
     # limits FPS to 60
