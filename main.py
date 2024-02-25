@@ -43,6 +43,13 @@ class Grid:
         for row in self.tiles:
             for tile in row:
                 tile.display(screen)
+    
+    def getTile(self, x, y):
+        x = int(x)
+        y = int(y)
+        # array starts at 0, (x, y) start at 1
+        # also, x + y are swapped in tile array
+        return self.tiles[y + 1][x + 1]
 
 class MovingEntity:
     def __init__(self, grid, x, y, speed, color):
