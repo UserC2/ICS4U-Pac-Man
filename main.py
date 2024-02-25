@@ -36,7 +36,7 @@ class Grid:
                 tile.display(screen)
 
 class MovingEntity:
-    def __init__(self, grid, x, y, speed):
+    def __init__(self, grid, x, y, speed, color):
         self.grid = grid
         self.x = x
         self.y = y
@@ -46,6 +46,7 @@ class MovingEntity:
         self.input_x_direction = -1
         self.input_y_direction = 0
         self.center_of_tile_detector_length = 1
+        self.color = color
         
     def update(self):
         # Checks if input is in a perpendicular direction, and if entity is in the center of grid detector
@@ -63,7 +64,7 @@ class MovingEntity:
         self.y += self.y_direction * self.speed
 
     def display(self, screen):
-        pygame.draw.rect(screen, ("yellow"),  (self.x + (self.grid.tile_size // 2), self.y + (self.grid.tile_size // 2), self.grid.tile_size, self.grid.tile_size))
+        pygame.draw.rect(screen, self.color, (self.x + (self.grid.tile_size // 2), self.y + (self.grid.tile_size // 2), self.grid.tile_size, self.grid.tile_size))
 
 # game setup
 pygame.init()
@@ -77,7 +78,7 @@ rows = 36
 columns = 28
 tile_size = 16
 grid = Grid(0, 0, rows, columns, tile_size)
-entity = MovingEntity(grid, 200, 200, 1.46)
+pacman = MovingEntity(grid, 200, 200, 1.46, ("yellow"))
 
 # main game loop
 while running:
@@ -89,23 +90,23 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                entity.input_x_direction = 0
-                entity.input_y_direction = -1
+                pacman.input_x_direction = 0
+                pacman.input_y_direction = -1
             if event.key == pygame.K_DOWN:
-                entity.input_x_direction = 0
-                entity.input_y_direction = 1
+                pacman.input_x_direction = 0
+                pacman.input_y_direction = 1
             if event.key == pygame.K_LEFT:
-                entity.input_x_direction = -1
-                entity.input_y_direction = 0
+                pacman.input_x_direction = -1
+                pacman.input_y_direction = 0
             if event.key == pygame.K_RIGHT:
-                entity.input_x_direction = 1
-                entity.input_y_direction = 0
+                pacman.input_x_direction = 1
+                pacman.input_y_direction = 0
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill((0, 0, 0))
     grid.display(screen)
-    entity.update()
-    entity.display(screen)
+    pacman.update()
+    pacman.display(screen)
     
     pygame.display.flip()
 
