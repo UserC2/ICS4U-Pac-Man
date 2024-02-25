@@ -3,14 +3,23 @@ from pygame.locals import *
 import math
 
 class Tile:
-    def __init__(self, x, y, size):
+    def __init__(self, x, y, size, color=(0, 0, 255), hidden=False):
         self.x = x
         self.y = y
         self.size = size
-        self.color = (0, 0, 255)
+        self.color = color
+        self.hidden = hidden
 
     def display(self, screen):
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
+        if not self.hidden:
+            pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
+
+    def onCollision(self, screen):
+        pass
+
+class Wall(Tile):
+    def __init__(self, x, y, size):
+        Tile.__init__(self, x, y, size, (65, 128, 255), False)
 
 class Grid:
     def __init__(self, x, y, rows, columns, tile_size):
