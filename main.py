@@ -65,22 +65,37 @@ class MovingEntity:
         self.color = color
         
     def update(self):
-        # Checks if input is in a perpendicular direction, and if entity is in the center of grid detector
         center_of_tile_x = (self.x // self.grid.tile_size) * self.grid.tile_size + self.grid.tile_size // 2
         center_of_tile_y = (self.y // self.grid.tile_size) * self.grid.tile_size + self.grid.tile_size // 2
+        
+        # if entity wants to turn, wait until it is in the center of the tile, then turn
         if (self.input_x_direction, self.input_y_direction) != (self.x_direction, self.y_direction) and (self.input_x_direction, self.input_y_direction) != (-self.x_direction, -self.y_direction) and (center_of_tile_x + self.center_of_tile_detector_length) > self.x and (center_of_tile_x - self.center_of_tile_detector_length) < self.x and (center_of_tile_y + self.center_of_tile_detector_length) > self.y and (center_of_tile_y - self.center_of_tile_detector_length) < self.y:
             # teleport to the center of the current tile
             self.x = center_of_tile_x
             self.y = center_of_tile_y
-            self.x_direction, self.y_direction = self.input_x_direction, self.input_y_direction
+            # change direction only if entity will be able to move in that direction
+            if not self.__movementProhibited(self.input_x_direction, self.input_y_direction):
+                self.x_direction, self.y_direction = self.input_x_direction, self.input_y_direction
+        # if entity wants to turn around, turn around immediately
         elif (self.input_x_direction, self.input_y_direction) == (-self.x_direction, -self.y_direction):
             self.x_direction, self.y_direction = self.input_x_direction, self.input_y_direction
 
-        self.x += self.x_direction * self.speed
-        self.y += self.y_direction * self.speed
+        if self.__movementProhibited(self.x_direction, self.y_direction):
+            self.x = center_of_tile_x
+            self.y = center_of_tile_y
+        else:
+            self.x += self.x_direction * self.speed
+            self.y += self.y_direction * self.speed
 
     def display(self, screen):
         pygame.draw.rect(screen, self.color, (self.x + (self.grid.tile_size // 2), self.y + (self.grid.tile_size // 2), self.grid.tile_size, self.grid.tile_size))
+
+    def __movementProhibited(self, x_dir, y_dir):
+        x = self.x // self.grid.tile_size
+        y = self.y // self.grid.tile_size
+        # check the next tile
+        nextTile = self.grid.getTile(x + x_dir, y + y_dir)
+        return isinstance(nextTile, Wall)
 
 # game setup
 pygame.init()
