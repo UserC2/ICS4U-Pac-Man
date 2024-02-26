@@ -130,16 +130,10 @@ class MovingEntity:
         nextTile = self.grid.get_tile(x + x_dir, y + y_dir)
         return isinstance(nextTile, Wall)
 
-# game setup
-pygame.init()
-screen = pygame.display.set_mode((1280, 720))
-clock = pygame.time.Clock()
-running = True
-dt = 0
-
+# grid setup
 rows = 36
 columns = 28
-tile_size = 16
+tile_size_pixels = 16
 # '\' ignores newline
 tile_map = """\
 XXXXXXXXXXXXXXXXXXXXXXXXXXXX\
@@ -179,7 +173,16 @@ XXXXX1.33X23333332X33.1XXXXX\
 XXXXXXXXXXXXXXXXXXXXXXXXXXXX\
 XXXXXXXXXXXXXXXXXXXXXXXXXXXX\
 """
-grid = Grid(0, 0, rows, columns, tile_size, tile_map)
+
+# game setup
+pygame.init()
+screen = pygame.display.set_mode((columns * tile_size_pixels, rows * tile_size_pixels))
+clock = pygame.time.Clock()
+running = True
+dt = 0
+
+# game objects
+grid = Grid(0, 0, rows, columns, tile_size_pixels, tile_map)
 pacman = MovingEntity(grid, 200, 408, 1.46, ("yellow"))
 
 # main game loop
